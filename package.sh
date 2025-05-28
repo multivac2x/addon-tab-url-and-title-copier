@@ -14,7 +14,9 @@ zip -r "build/$PACKAGE_NAME" \
     popup \
     icons \
     -x ".*" \
-    -x "__MACOSX" \
-    -x "node_modules/*"
+    -x "*/.*" \
+    -x "__MACOSX*" \
+    -x "node_modules/*" \
+    -x "*.DS_Store*"
 
 echo "Extension packaged as build/$PACKAGE_NAME"

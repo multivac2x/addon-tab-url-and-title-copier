@@ -3,7 +3,7 @@ const statusMessage = document.getElementById('status-message');
 
 copyTabsButton.addEventListener('click', async () => {
   try {
-    const tabs = await chrome.tabs.query({ currentWindow: true });
+    const tabs = await browser.tabs.query({ currentWindow: true });
     const urls = tabs.map(tab => tab.url);
     const urlsString = urls.join('\n');
 
