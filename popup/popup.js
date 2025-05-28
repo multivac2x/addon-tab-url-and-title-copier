@@ -3,9 +3,9 @@ const statusMessage = document.getElementById('status-message');
 
 copyTabsButton.addEventListener('click', async () => {
   try {
-    const tabs = await browser.tabs.query({ currentWindow: true });
+    const tabs = await chrome.tabs.query({ currentWindow: true });
     const urls = tabs.map(tab => tab.url);
-    const urlsString = urls.join('\\n');
+    const urlsString = urls.join('\n');
 
     await navigator.clipboard.writeText(urlsString);
     statusMessage.textContent = `Copied ${urls.length} tab URL(s)!`;
@@ -17,7 +17,7 @@ copyTabsButton.addEventListener('click', async () => {
   } catch (error) {
     console.error("Error copying tab URLs:", error);
     statusMessage.textContent = 'Error copying URLs.';
-     // Clear the message after a few seconds
+    // Clear the message after a few seconds
     setTimeout(() => {
       statusMessage.textContent = '';
     }, 3000);
