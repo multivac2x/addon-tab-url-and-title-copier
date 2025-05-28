@@ -26,20 +26,14 @@ A Firefox extension that allows you to quickly copy all open tab URLs from the c
 3. Add placeholder icons:
    - Create `icons/icon-48.png` (48x48 pixels)
    - Create `icons/icon-96.png` (96x96 pixels)
-4. Zip the following files maintaining the directory structure:
+4. Run the packaging script:
+   ```bash
+   ./package.sh
    ```
-   manifest.json
-   popup/
-     ├── popup.html
-     ├── popup.css
-     └── popup.js
-   icons/
-     ├── icon-48.png
-     └── icon-96.png
-   ```
+   This will create a ZIP file in the `build` directory.
 5. In Firefox, go to `about:addons`
 6. Click the gear icon and select "Install Add-on From File"
-7. Select your zip file
+7. Select the generated ZIP file from the `build` directory
 
 ## Usage
 
@@ -55,7 +49,22 @@ To modify or enhance the extension:
 1. Clone this repository
 2. Make your changes to the source files
 3. Test the extension using the development installation steps above
-4. Package the extension following the manual installation steps when ready
+4. Package the extension using the `package.sh` script when ready
+
+## Packaging the Extension
+
+The extension comes with a packaging script that creates a ZIP file ready for distribution:
+
+1. Ensure all files are in place (manifest.json, popup files, and icons)
+2. Make the script executable (if not already):
+   ```bash
+   chmod +x package.sh
+   ```
+3. Run the packaging script:
+   ```bash
+   ./package.sh
+   ```
+4. The packaged extension will be created in the `build` directory as `firefox-tab-url-copier-v{version}.zip`
 
 ## Project Structure
 
@@ -65,6 +74,8 @@ To modify or enhance the extension:
 │   ├── popup.html       # Popup interface
 │   ├── popup.css        # Popup styles
 │   └── popup.js         # Popup functionality
-└── icons/
-    ├── icon-48.png      # Small icon
-    └── icon-96.png      # Large icon
+├── icons/
+│   ├── icon-48.png      # Small icon
+│   └── icon-96.png      # Large icon
+├── package.sh           # Packaging script
+└── build/               # Generated extension packages
