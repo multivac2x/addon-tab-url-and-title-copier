@@ -4,7 +4,10 @@ const statusMessage = document.getElementById('status-message');
 copyTabsButton.addEventListener('click', async () => {
   try {
     const tabs = await browser.tabs.query({ currentWindow: true });
-    const urls = tabs.map(tab => tab.url);
+    // Filter out all about: pages that aren't useful URLs
+    const urls = tabs
+      .filter(tab => !tab.url.startsWith('about:'))
+      .map(tab => tab.url);
     const urlsString = urls.join('\n');
 
     await navigator.clipboard.writeText(urlsString);
