@@ -13,7 +13,8 @@ A Firefox extension that allows you to quickly copy all open tab URLs from the c
 
 ### Development/Testing Installation
 
-1. Open Firefox and navigate to `about:debugging`
+1. Open Firefox and navigate to [`about:debugging#/runtime/this-firefox`](about:debugging#/runtime/this-firefox)  
+   *(You can copy and paste this link into your Firefox address bar)*
 2. Click on "This Firefox" in the left sidebar
 3. Click the "Load Temporary Add-on" button
 4. Navigate to your extension's directory and select the `manifest.json` file
