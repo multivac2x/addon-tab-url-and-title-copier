@@ -73,7 +73,9 @@ function shouldExcludeUrl(url) {
     // WhatsApp Web
     'https://web.whatsapp.com/',
     // GitHub for multivac2x user
-    'https://github.com/multivac2x'
+    'https://github.com/multivac2x',
+    // Claude AI
+    'https://claude.ai'
   ];
   
   // Check exact matches first
