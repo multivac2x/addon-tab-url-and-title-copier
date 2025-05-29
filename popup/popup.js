@@ -48,8 +48,14 @@ function cleanPageTitle(title) {
     title = title.replace(' - YouTube', '');
   }
   
+  // Remove YouTube notification numbers like (28755) or (123)
+  title = title.replace(/\(\d+\)\s*/g, '');
+  
   // Remove excessive whitespace and newlines
   title = title.replace(/\s+/g, ' ').trim();
+  
+  // Escape double quotes for CSV format
+  title = title.replace(/"/g, '""');
   
   // Limit title length for better readability
   if (title.length > 80) {
@@ -59,26 +65,49 @@ function cleanPageTitle(title) {
   return title;
 }
 
+// Function to check if a URL should be excluded
+function shouldExcludeUrl(url) {
+  const excludePatterns = [
+    // Google Drive home
+    'https://drive.google.com/drive/home',
+    // WhatsApp Web
+    'https://web.whatsapp.com/',
+    // GitHub for multivac2x user
+    'https://github.com/multivac2x'
+  ];
+  
+  // Check exact matches first
+  if (excludePatterns.some(pattern => url === pattern || url.startsWith(pattern))) {
+    return true;
+  }
+  
+  return false;
+}
+
 copyTabsButton.addEventListener('click', async () => {
   try {
     const tabs = await browser.tabs.query({ currentWindow: true });
     
-    // Filter out all about: pages that aren't useful URLs
-    const validTabs = tabs.filter(tab => !tab.url.startsWith('about:'));
+    // Filter out about: pages and excluded URLs
+    const validTabs = tabs.filter(tab =>
+      !tab.url.startsWith('about:') && !shouldExcludeUrl(tab.url)
+    );
     
-    // Process each tab to include title and cleaned URL
-    const tabData = validTabs.map(tab => {
+    // Process each tab to create CSV format: URL, Title
+    const csvRows = validTabs.map(tab => {
       const cleanedUrl = cleanYouTubeUrl(tab.url);
       const cleanedTitle = cleanPageTitle(tab.title);
       
-      // Format: "Page Title | URL"
-      return `${cleanedTitle} | ${cleanedUrl}`;
+      // CSV format: "URL","Title" - URL in first column, title in second
+      return `"${cleanedUrl}","${cleanedTitle}"`;
     });
     
-    const tabsString = tabData.join('\n');
+    // Add CSV header
+    const csvHeader = '"URL","Title"';
+    const csvString = [csvHeader, ...csvRows].join('\n');
 
-    await navigator.clipboard.writeText(tabsString);
-    statusMessage.textContent = `Copied ${validTabs.length} tab(s) with titles and URLs!`;
+    await navigator.clipboard.writeText(csvString);
+    statusMessage.textContent = `Copied ${validTabs.length} tab(s) as CSV format!`;
     
     // Clear the message after a few seconds
     setTimeout(() => {
