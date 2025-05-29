@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Tab URL Copier",
-  "version": "1.0",
-  "description": "Copies all open tab URLs to the clipboard.",
+  "name": "Tab URL & Title Copier",
+  "version": "1.1",
+  "description": "Copies all open tab titles and URLs to the clipboard with YouTube URL cleaning for better categorization.",
   "permissions": [
     "tabs",
     "<all_urls>"
@@ -12,7 +12,7 @@
       "48": "icons/icon-48.png",
       "96": "icons/icon-96.png"
     },
-    "default_title": "Copy Tab URLs",
+    "default_title": "Copy Tab Titles & URLs",
     "default_popup": "popup/popup.html"
   },
   "icons": {
