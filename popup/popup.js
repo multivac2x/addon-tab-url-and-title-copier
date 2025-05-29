@@ -73,14 +73,22 @@ function shouldExcludeUrl(url) {
     // WhatsApp Web
     'https://web.whatsapp.com/',
     // GitHub for multivac2x user
-    'https://github.com/multivac2x',
-    // Claude AI
-    'https://claude.ai'
+    'https://github.com/multivac2x'
   ];
   
-  // Check exact matches first
+  // Check exact matches and startsWith patterns
   if (excludePatterns.some(pattern => url === pattern || url.startsWith(pattern))) {
     return true;
+  }
+  
+  // Check Claude AI domain (all variations)
+  try {
+    const urlObj = new URL(url);
+    if (urlObj.hostname === 'claude.ai') {
+      return true;
+    }
+  } catch (error) {
+    // If URL parsing fails, don't exclude
   }
   
   return false;
