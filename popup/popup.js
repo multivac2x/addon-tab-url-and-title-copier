@@ -1,6 +1,56 @@
 const copyTabsButton = document.getElementById('copy-tabs-button');
 const statusMessage = document.getElementById('status-message');
 
+// Save checkbox states to local storage
+function saveCheckboxStates() {
+  const states = {
+    filterGoogleDrive: document.getElementById('filter-google-drive').checked,
+    filterWhatsApp: document.getElementById('filter-whatsapp').checked,
+    filterGitHub: document.getElementById('filter-github').checked,
+    filterClaude: document.getElementById('filter-claude').checked,
+    filterAboutPages: document.getElementById('filter-about-pages').checked
+  };
+  browser.storage.local.set({ filterStates: states });
+}
+
+// Load checkbox states from local storage
+async function loadCheckboxStates() {
+  try {
+    const result = await browser.storage.local.get('filterStates');
+    if (result.filterStates) {
+      const states = result.filterStates;
+      document.getElementById('filter-google-drive').checked = states.filterGoogleDrive ?? true;
+      document.getElementById('filter-whatsapp').checked = states.filterWhatsApp ?? true;
+      document.getElementById('filter-github').checked = states.filterGitHub ?? true;
+      document.getElementById('filter-claude').checked = states.filterClaude ?? true;
+      document.getElementById('filter-about-pages').checked = states.filterAboutPages ?? true;
+    }
+  } catch (error) {
+    console.log('No saved filter states found, using defaults');
+  }
+}
+
+// Initialize checkbox event listeners
+function initializeCheckboxListeners() {
+  const checkboxes = [
+    'filter-google-drive',
+    'filter-whatsapp',
+    'filter-github',
+    'filter-claude',
+    'filter-about-pages'
+  ];
+  
+  checkboxes.forEach(id => {
+    document.getElementById(id).addEventListener('change', saveCheckboxStates);
+  });
+}
+
+// Load states when popup opens
+document.addEventListener('DOMContentLoaded', () => {
+  loadCheckboxStates();
+  initializeCheckboxListeners();
+});
+
 // Function to clean YouTube URLs by removing unnecessary parameters
 function cleanYouTubeUrl(url) {
   try {
@@ -65,30 +115,45 @@ function cleanPageTitle(title) {
   return title;
 }
 
-// Function to check if a URL should be excluded
+// Function to check if a URL should be excluded based on checkbox states
 function shouldExcludeUrl(url) {
-  const excludePatterns = [
-    // Google Drive home
-    'https://drive.google.com/drive/home',
-    // WhatsApp Web
-    'https://web.whatsapp.com/',
-    // GitHub for multivac2x user
-    'https://github.com/multivac2x'
-  ];
+  // Get checkbox states
+  const filterGoogleDrive = document.getElementById('filter-google-drive').checked;
+  const filterWhatsApp = document.getElementById('filter-whatsapp').checked;
+  const filterGitHub = document.getElementById('filter-github').checked;
+  const filterClaude = document.getElementById('filter-claude').checked;
   
-  // Check exact matches and startsWith patterns
-  if (excludePatterns.some(pattern => url === pattern || url.startsWith(pattern))) {
-    return true;
-  }
-  
-  // Check Claude AI domain (all variations)
-  try {
-    const urlObj = new URL(url);
-    if (urlObj.hostname === 'claude.ai') {
+  // Check Google Drive exclusion
+  if (filterGoogleDrive) {
+    if (url === 'https://drive.google.com/drive/home' || url.startsWith('https://drive.google.com/drive/home')) {
       return true;
     }
-  } catch (error) {
-    // If URL parsing fails, don't exclude
+  }
+  
+  // Check WhatsApp Web exclusion
+  if (filterWhatsApp) {
+    if (url.startsWith('https://web.whatsapp.com/')) {
+      return true;
+    }
+  }
+  
+  // Check GitHub profile exclusion
+  if (filterGitHub) {
+    if (url.startsWith('https://github.com/multivac2x')) {
+      return true;
+    }
+  }
+  
+  // Check Claude AI exclusion
+  if (filterClaude) {
+    try {
+      const urlObj = new URL(url);
+      if (urlObj.hostname === 'claude.ai') {
+        return true;
+      }
+    } catch (error) {
+      // If URL parsing fails, don't exclude
+    }
   }
   
   return false;
@@ -98,10 +163,19 @@ copyTabsButton.addEventListener('click', async () => {
   try {
     const tabs = await browser.tabs.query({ currentWindow: true });
     
-    // Filter out about: pages and excluded URLs
-    const validTabs = tabs.filter(tab =>
-      !tab.url.startsWith('about:') && !shouldExcludeUrl(tab.url)
-    );
+    // Get about pages filter state
+    const filterAboutPages = document.getElementById('filter-about-pages').checked;
+    
+    // Filter out tabs based on checkbox settings
+    const validTabs = tabs.filter(tab => {
+      // Check about: pages filter
+      if (filterAboutPages && tab.url.startsWith('about:')) {
+        return false;
+      }
+      
+      // Check other URL exclusions
+      return !shouldExcludeUrl(tab.url);
+    });
     
     // Process each tab to create CSV format: URL, Title
     const csvRows = validTabs.map(tab => {

@@ -5,6 +5,7 @@
   "description": "Copies all open tab titles and URLs to the clipboard with YouTube URL cleaning for better categorization.",
   "permissions": [
     "tabs",
+    "storage",
     "<all_urls>"
   ],
   "browser_action": {

@@ -5,6 +5,41 @@
   <link rel="stylesheet" href="popup.css"/>
 </head>
 <body>
+  <div class="filter-section">
+    <h3>Website Filters</h3>
+    <div class="checkbox-group">
+      <label class="checkbox-item">
+        <input type="checkbox" id="filter-google-drive" checked>
+        <span class="checkbox-label">Google Drive</span>
+        <span class="checkbox-description">Exclude Google Drive home page</span>
+      </label>
+      
+      <label class="checkbox-item">
+        <input type="checkbox" id="filter-whatsapp" checked>
+        <span class="checkbox-label">WhatsApp Web</span>
+        <span class="checkbox-description">Exclude WhatsApp web interface</span>
+      </label>
+      
+      <label class="checkbox-item">
+        <input type="checkbox" id="filter-github" checked>
+        <span class="checkbox-label">GitHub Profile</span>
+        <span class="checkbox-description">Exclude personal GitHub profile</span>
+      </label>
+      
+      <label class="checkbox-item">
+        <input type="checkbox" id="filter-claude" checked>
+        <span class="checkbox-label">Claude AI</span>
+        <span class="checkbox-description">Exclude Claude AI conversations</span>
+      </label>
+      
+      <label class="checkbox-item">
+        <input type="checkbox" id="filter-about-pages" checked>
+        <span class="checkbox-label">Browser Pages</span>
+        <span class="checkbox-description">Exclude about: and internal pages</span>
+      </label>
+    </div>
+  </div>
+  
   <button id="copy-tabs-button">Copy Tabs as CSV</button>
   <p id="status-message"></p>
   <script src="popup.js"></script>

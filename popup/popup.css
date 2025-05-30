@@ -1,8 +1,8 @@
 body {
-  width: 200px;
-  padding: 10px;
+  width: 280px;
+  padding: 12px;
   font-family: sans-serif;
-  text-align: center;
+  text-align: left;
 }
 
 button {
@@ -21,4 +21,67 @@ button:hover {
 #status-message {
   font-size: 0.9em;
   color: #333;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.filter-section {
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.filter-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 1em;
+  color: #333;
+  text-align: center;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkbox-item {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.checkbox-item:hover {
+  background-color: #f0f0f0;
+}
+
+.checkbox-item input[type="checkbox"] {
+  margin-right: 8px;
+  margin-bottom: 2px;
+  align-self: flex-start;
+}
+
+.checkbox-label {
+  font-weight: 500;
+  font-size: 0.9em;
+  color: #333;
+  margin-left: 20px;
+  margin-top: -18px;
+}
+
+.checkbox-description {
+  font-size: 0.75em;
+  color: #666;
+  margin-left: 20px;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+#copy-tabs-button {
+  margin-top: 10px;
+  text-align: center;
 }
