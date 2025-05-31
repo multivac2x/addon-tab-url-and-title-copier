@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Supabase Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .config-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .config-input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        .steps {
+            background-color: #e9ecef;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .steps ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .steps li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Supabase Connection Tester</h1>
+        
+        <div class="info">
+            <strong>Purpose:</strong> This tool helps you verify that your Supabase configuration is correct before using it in the Firefox extension.
+        </div>
+
+        <div class="steps">
+            <strong>Before you start:</strong>
+            <ol>
+                <li>Create a Supabase project at <a href="https://supabase.com" target="_blank">supabase.com</a></li>
+                <li>Run the SQL commands from <code>supabase-setup.sql</code> in your Supabase SQL editor</li>
+                <li>Enable Anonymous authentication in your Supabase project settings</li>
+                <li>Get your project URL and anon key from the API settings</li>
+            </ol>
+        </div>
+
+        <div class="config-section">
+            <h3>Enter Your Supabase Configuration</h3>
+            <label for="supabase-url">Supabase Project URL:</label>
+            <input type="text" id="supabase-url" class="config-input" placeholder="https://your-project-ref.supabase.co">
+            
+            <label for="supabase-key">Supabase Anon Key:</label>
+            <input type="text" id="supabase-key" class="config-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+            
+            <button onclick="testConnection()">Test Connection</button>
+            <button onclick="testFullWorkflow()">Test Full Workflow</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+
+        <div id="results"></div>
+
+        <div class="info">
+            <strong>Next Steps:</strong> Once the connection test passes, copy your URL and key to the <code>supabase-config.js</code> file in your extension directory.
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        let supabaseClient = null;
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testConnection() {
+            clearResults();
+            
+            const url = document.getElementById('supabase-url').value.trim();
+            const key = document.getElementById('supabase-key').value.trim();
+
+            if (!url || !key) {
+                addResult('❌ Please enter both URL and key', 'error');
+                return;
+            }
+
+            try {
+                addResult('🔄 Testing Supabase connection...', 'info');
+                
+                // Initialize client
+                supabaseClient = window.supabase.createClient(url, key);
+                addResult('✅ Supabase client initialized successfully', 'success');
+
+                // Test anonymous authentication
+                addResult('🔄 Testing anonymous authentication...', 'info');
+                const { data: authData, error: authError } = await supabaseClient.auth.signInAnonymously();
+                
+                if (authError) {
+                    throw new Error(`Authentication failed: ${authError.message}`);
+                }
+
+                addResult(`✅ Anonymous authentication successful! User ID: ${authData.user.id}`, 'success');
+
+                // Test database connection
+                addResult('🔄 Testing database connection...', 'info');
+                const { data: tableData, error: tableError } = await supabaseClient
+                    .from('link_batches')
+                    .select('count', { count: 'exact', head: true });
+
+                if (tableError) {
+                    throw new Error(`Database connection failed: ${tableError.message}`);
+                }
+
+                addResult('✅ Database connection successful! Table exists and is accessible.', 'success');
+                addResult('🎉 All connection tests passed! Your Supabase setup is working correctly.', 'success');
+
+            } catch (error) {
+                addResult(`❌ Connection test failed: ${error.message}`, 'error');
+                
+                if (error.message.includes('Invalid API key')) {
+                    addResult('💡 Check that your anon key is correct and hasn\'t expired', 'warning');
+                } else if (error.message.includes('relation "link_batches" does not exist')) {
+                    addResult('💡 The link_batches table doesn\'t exist. Run the SQL commands from supabase-setup.sql', 'warning');
+                } else if (error.message.includes('Anonymous sign-ins are disabled')) {
+                    addResult('💡 Enable Anonymous authentication in your Supabase project settings', 'warning');
+                }
+            }
+        }
+
+        async function testFullWorkflow() {
+            if (!supabaseClient) {
+                addResult('❌ Please run "Test Connection" first', 'error');
+                return;
+            }
+
+            try {
+                addResult('🔄 Testing full workflow (insert and retrieve data)...', 'info');
+
+                // Test data
+                const testData = [
+                    { url: 'https://www.example.com', title: 'Example Domain' },
+                    { url: 'https://www.google.com', title: 'Google' }
+                ];
+
+                // Insert test data
+                const { data: insertData, error: insertError } = await supabaseClient
+                    .from('link_batches')
+                    .insert([{ links: testData }])
+                    .select();
+
+                if (insertError) {
+                    throw new Error(`Insert failed: ${insertError.message}`);
+                }
+
+                addResult('✅ Test data inserted successfully', 'success');
+
+                // Retrieve data
+                const { data: selectData, error: selectError } = await supabaseClient
+                    .from('link_batches')
+                    .select('*')
+                    .limit(5);
+
+                if (selectError) {
+                    throw new Error(`Select failed: ${selectError.message}`);
+                }
+
+                addResult(`✅ Data retrieved successfully! Found ${selectData.length} record(s)`, 'success');
+                addResult('🎉 Full workflow test passed! Your extension will work correctly.', 'success');
+
+                // Clean up test data
+                if (insertData && insertData.length > 0) {
+                    await supabaseClient
+                        .from('link_batches')
+                        .delete()
+                        .eq('id', insertData[0].id);
+                    addResult('🧹 Test data cleaned up', 'info');
+                }
+
+            } catch (error) {
+                addResult(`❌ Workflow test failed: ${error.message}`, 'error');
+                
+                if (error.message.includes('permission denied')) {
+                    addResult('💡 Check that Row Level Security policies are set up correctly', 'warning');
+                } else if (error.message.includes('violates row-level security policy')) {
+                    addResult('💡 RLS policies might be too restrictive. Verify the setup in supabase-setup.sql', 'warning');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

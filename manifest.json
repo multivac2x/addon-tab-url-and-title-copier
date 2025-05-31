@@ -1,13 +1,14 @@
 {
   "manifest_version": 2,
   "name": "Tab URL & Title Copier",
-  "version": "1.1",
-  "description": "Copies all open tab titles and URLs to the clipboard with YouTube URL cleaning for better categorization.",
+  "version": "1.2",
+  "description": "Copies all open tab titles and URLs to the clipboard with YouTube URL cleaning and cloud storage via Supabase.",
   "permissions": [
     "tabs",
     "storage",
     "<all_urls>"
   ],
+  "content_security_policy": "script-src 'self' https://*.supabase.co https://unpkg.com; connect-src 'self' https://*.supabase.co; object-src 'self'",
   "browser_action": {
     "default_icon": {
       "48": "icons/icon-48.png",

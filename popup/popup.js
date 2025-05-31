@@ -1,5 +1,96 @@
+// Supabase client instance
+let supabase = null;
+let currentUser = null;
+
+// DOM elements
 const copyTabsButton = document.getElementById('copy-tabs-button');
 const statusMessage = document.getElementById('status-message');
+const connectionStatus = document.getElementById('connection-status');
+const statusIndicator = document.getElementById('status-indicator');
+const statusText = document.getElementById('status-text');
+const saveToCloudCheckbox = document.getElementById('save-to-cloud');
+
+// Initialize Supabase
+async function initializeSupabase() {
+  try {
+    if (typeof window.supabase === 'undefined') {
+      throw new Error('Supabase SDK not loaded');
+    }
+
+    // Check if config is available
+    if (typeof SUPABASE_CONFIG === 'undefined') {
+      throw new Error('Supabase configuration not found');
+    }
+
+    // Initialize Supabase client
+    supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+    
+    // Check if we need to update configuration
+    if (SUPABASE_CONFIG.url.includes('your-project-ref') || 
+        SUPABASE_CONFIG.anonKey.includes('your-anon-public-key')) {
+      updateConnectionStatus('config', 'Please configure Supabase credentials');
+      return false;
+    }
+
+    // Try to sign in anonymously
+    const { data, error } = await supabase.auth.signInAnonymously();
+    
+    if (error) {
+      console.error('Supabase auth error:', error);
+      updateConnectionStatus('error', 'Authentication failed');
+      return false;
+    }
+
+    currentUser = data.user;
+    updateConnectionStatus('connected', 'Connected to cloud storage');
+    return true;
+
+  } catch (error) {
+    console.error('Supabase initialization error:', error);
+    updateConnectionStatus('error', 'Connection failed');
+    return false;
+  }
+}
+
+// Update connection status UI
+function updateConnectionStatus(status, message) {
+  if (statusText && statusIndicator) {
+    statusText.textContent = message;
+    statusIndicator.className = `status-indicator ${status}`;
+  }
+  
+  // Show/hide cloud save option based on connection
+  if (saveToCloudCheckbox) {
+    if (status === 'connected') {
+      saveToCloudCheckbox.disabled = false;
+    } else {
+      saveToCloudCheckbox.disabled = true;
+      saveToCloudCheckbox.checked = false;
+    }
+  }
+}
+
+// Save tabs to Supabase
+async function saveTabsToCloud(tabData) {
+  if (!supabase || !currentUser) {
+    throw new Error('Not connected to cloud storage');
+  }
+
+  const { data, error } = await supabase
+    .from(SUPABASE_CONFIG.tableName)
+    .insert([
+      {
+        user_id: currentUser.id,
+        links: tabData
+      }
+    ]);
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
 
 // Save checkbox states to local storage
 function saveCheckboxStates() {
@@ -8,7 +99,8 @@ function saveCheckboxStates() {
     filterWhatsApp: document.getElementById('filter-whatsapp').checked,
     filterGitHub: document.getElementById('filter-github').checked,
     filterClaude: document.getElementById('filter-claude').checked,
-    filterAboutPages: document.getElementById('filter-about-pages').checked
+    filterAboutPages: document.getElementById('filter-about-pages').checked,
+    saveToCloud: saveToCloudCheckbox ? saveToCloudCheckbox.checked : false
   };
   browser.storage.local.set({ filterStates: states });
 }
@@ -24,6 +116,9 @@ async function loadCheckboxStates() {
       document.getElementById('filter-github').checked = states.filterGitHub ?? true;
       document.getElementById('filter-claude').checked = states.filterClaude ?? true;
       document.getElementById('filter-about-pages').checked = states.filterAboutPages ?? true;
+      if (saveToCloudCheckbox) {
+        saveToCloudCheckbox.checked = states.saveToCloud ?? true;
+      }
     }
   } catch (error) {
     console.log('No saved filter states found, using defaults');
@@ -40,16 +135,18 @@ function initializeCheckboxListeners() {
     'filter-about-pages'
   ];
   
+  // Add save-to-cloud if it exists
+  if (saveToCloudCheckbox) {
+    checkboxes.push('save-to-cloud');
+  }
+  
   checkboxes.forEach(id => {
-    document.getElementById(id).addEventListener('change', saveCheckboxStates);
+    const checkbox = document.getElementById(id);
+    if (checkbox) {
+      checkbox.addEventListener('change', saveCheckboxStates);
+    }
   });
 }
-
-// Load states when popup opens
-document.addEventListener('DOMContentLoaded', () => {
-  loadCheckboxStates();
-  initializeCheckboxListeners();
-});
 
 // Function to clean YouTube URLs by removing unnecessary parameters
 function cleanYouTubeUrl(url) {
@@ -159,6 +256,7 @@ function shouldExcludeUrl(url) {
   return false;
 }
 
+// Main copy tabs function
 copyTabsButton.addEventListener('click', async () => {
   try {
     const tabs = await browser.tabs.query({ currentWindow: true });
@@ -177,26 +275,38 @@ copyTabsButton.addEventListener('click', async () => {
       return !shouldExcludeUrl(tab.url);
     });
     
-    // Process each tab to create CSV format: URL, Title
-    const csvRows = validTabs.map(tab => {
-      const cleanedUrl = cleanYouTubeUrl(tab.url);
-      const cleanedTitle = cleanPageTitle(tab.title);
-      
-      // CSV format: "URL","Title" - URL in first column, title in second
-      return `"${cleanedUrl}","${cleanedTitle}"`;
-    });
+    // Process each tab to create structured data
+    const tabData = validTabs.map(tab => ({
+      url: cleanYouTubeUrl(tab.url),
+      title: cleanPageTitle(tab.title)
+    }));
     
-    // Add CSV header
+    // Create CSV format: URL, Title
+    const csvRows = tabData.map(tab => `"${tab.url}","${tab.title}"`);
     const csvHeader = '"URL","Title"';
     const csvString = [csvHeader, ...csvRows].join('\n');
 
+    // Copy to clipboard
     await navigator.clipboard.writeText(csvString);
-    statusMessage.textContent = `Copied ${validTabs.length} tab(s) as CSV format!`;
+    
+    // Save to cloud if enabled and connected
+    let cloudSaveMessage = '';
+    if (saveToCloudCheckbox && saveToCloudCheckbox.checked && !saveToCloudCheckbox.disabled) {
+      try {
+        await saveTabsToCloud(tabData);
+        cloudSaveMessage = ' and saved to cloud';
+      } catch (cloudError) {
+        console.error('Cloud save error:', cloudError);
+        cloudSaveMessage = ' (cloud save failed)';
+      }
+    }
+    
+    statusMessage.textContent = `Copied ${validTabs.length} tab(s) as CSV format${cloudSaveMessage}!`;
     
     // Clear the message after a few seconds
     setTimeout(() => {
       statusMessage.textContent = '';
-    }, 3000);
+    }, 4000);
 
   } catch (error) {
     console.error("Error copying tab data:", error);
@@ -206,5 +316,16 @@ copyTabsButton.addEventListener('click', async () => {
     setTimeout(() => {
       statusMessage.textContent = '';
     }, 3000);
+  }
+});
+
+// Initialize everything when DOM loads
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadCheckboxStates();
+  initializeCheckboxListeners();
+  
+  // Initialize Supabase if configuration elements exist
+  if (statusText && statusIndicator) {
+    await initializeSupabase();
   }
 });

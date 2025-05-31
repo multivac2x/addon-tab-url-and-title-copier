@@ -1,13 +1,17 @@
-# Firefox Tab URL Copier
+# Tab URL & Title Copier
 
-A Firefox extension that allows you to quickly copy all open tab URLs from the current window to your clipboard.
+A Firefox extension that allows you to quickly copy all open tab URLs and titles from the current window to your clipboard in CSV format, with optional cloud storage via Supabase.
 
 ## Features
 
-- Copy URLs of all open tabs in the current window with a single click
-- Simple and lightweight interface
-- Visual confirmation when URLs are copied
-- Works with any number of tabs
+- **CSV Export**: Copy URLs and titles of all open tabs in CSV format with a single click
+- **Smart Filtering**: Configurable filters to exclude specific websites (Google Drive, WhatsApp, GitHub profile, Claude AI, browser internal pages)
+- **YouTube URL Cleaning**: Automatically removes tracking parameters from YouTube URLs
+- **Cloud Storage**: Optional integration with Supabase for persistent storage of your tab collections
+- **Anonymous Authentication**: No registration required - uses anonymous user sessions
+- **Real-time Status**: Connection indicator shows cloud storage status
+- **Simple Interface**: Clean, intuitive popup design
+- **Local Storage**: Remembers your filter preferences
 
 ## Installation Instructions
 
@@ -39,9 +43,44 @@ A Firefox extension that allows you to quickly copy all open tab URLs from the c
 
 **Note**: Extensions installed this way are temporary and will be removed when Firefox restarts. This is Firefox's security requirement for unsigned extensions.
 
-## Usage
+## Quick Start
 
-1. Click the extension icon in the Firefox toolbar
+1. **Basic Usage (Clipboard Only)**:
+   - Load the extension using the installation steps below
+   - Click the extension icon in the Firefox toolbar
+   - Click "Copy Tabs as CSV" to copy all tab data to clipboard
+   - Paste the CSV data wherever you need it
+
+2. **With Cloud Storage** (Optional):
+   - Follow the [Supabase Setup Guide](SUPABASE_SETUP.md) to enable cloud storage
+   - Configure your Supabase credentials in [`supabase-config.js`](supabase-config.js)
+   - The extension will automatically save your tab collections to the cloud
+
+## Detailed Usage
+
+1. **Open the Extension**: Click the extension icon in the Firefox toolbar
+2. **Configure Filters**: Use the checkboxes to exclude specific types of websites:
+   - Google Drive home pages
+   - WhatsApp Web
+   - Your GitHub profile
+   - Claude AI conversations
+   - Browser internal pages (about: URLs)
+3. **Cloud Storage** (if configured):
+   - Check "Save to Cloud" to automatically save tab collections to Supabase
+   - Monitor the connection status indicator
+4. **Copy Tabs**: Click "Copy Tabs as CSV"
+5. **Use the Data**: Paste the CSV data into spreadsheets, documents, or other applications
+
+## Cloud Storage Setup
+
+To enable cloud storage features, see the comprehensive [Supabase Setup Guide](SUPABASE_SETUP.md).
+
+**Benefits of Cloud Storage**:
+- Persistent storage of your tab collections
+- Access data across different browser sessions
+- Backup of your browsing research
+- Anonymous and secure (no personal info required)
+
 ## Extension Signing and Permanent Installation
 
 ### Why "Load Temporary Add-on" is Required
@@ -113,13 +152,49 @@ The extension comes with a packaging script that creates a ZIP file ready for di
 ## Project Structure
 
 ```
-├── manifest.json         # Extension configuration
+├── manifest.json            # Extension configuration
 ├── popup/
-│   ├── popup.html       # Popup interface
-│   ├── popup.css        # Popup styles
-│   └── popup.js         # Popup functionality
+│   ├── popup.html          # Popup interface
+│   ├── popup.css           # Popup styles
+│   └── popup.js            # Popup functionality with Supabase integration
 ├── icons/
-│   ├── icon-48.png      # Small icon
-│   └── icon-96.png      # Large icon
-├── package.sh           # Packaging script
-└── build/               # Generated extension packages
+│   ├── icon-48.png         # Small icon
+│   └── icon-96.png         # Large icon
+├── supabase-config.js      # Supabase configuration (update with your credentials)
+├── supabase-setup.sql      # Database schema for Supabase
+├── SUPABASE_SETUP.md       # Comprehensive setup guide for cloud storage
+├── database_integration_plan.md  # Technical implementation details
+├── package.sh              # Packaging script
+└── build/                  # Generated extension packages
+```
+
+## Data Format
+
+The extension exports data in CSV format with two columns:
+- **URL**: Cleaned and normalized web addresses
+- **Title**: Page titles with YouTube notification numbers removed
+
+**Example Output**:
+```csv
+"URL","Title"
+"https://www.youtube.com/watch?v=dQw4w9WgXcQ","Never Gonna Give You Up"
+"https://github.com/microsoft/vscode","Visual Studio Code"
+"https://www.mozilla.org/","Mozilla"
+```
+
+## Technical Details
+
+- **Framework**: Vanilla JavaScript with WebExtensions API
+- **Database**: PostgreSQL via Supabase (optional)
+- **Authentication**: Supabase Anonymous Auth
+- **Security**: Row Level Security (RLS) policies
+- **Storage**: Local browser storage for preferences, cloud for data collections
+- **Permissions**: Tabs, storage, and external connections to Supabase
+
+## Privacy & Security
+
+- **Anonymous Usage**: No personal information required or collected
+- **Data Isolation**: Each anonymous user session has isolated data
+- **Secure Storage**: Data encrypted in transit and at rest via Supabase
+- **Local Control**: Cloud storage is entirely optional
+- **Content Security Policy**: Restricts external connections to trusted domains only

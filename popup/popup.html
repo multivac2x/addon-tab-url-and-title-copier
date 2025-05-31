@@ -39,9 +39,32 @@
       </label>
     </div>
   </div>
+
+  <div class="cloud-storage-section">
+    <h3>Cloud Storage</h3>
+    <div class="storage-controls">
+      <label class="checkbox-item">
+        <input type="checkbox" id="save-to-cloud" checked>
+        <span class="checkbox-label">Save to Cloud</span>
+        <span class="checkbox-description">Automatically save tabs to Supabase</span>
+      </label>
+      <div id="connection-status" class="connection-status">
+        <span class="status-indicator" id="status-indicator"></span>
+        <span id="status-text">Connecting...</span>
+      </div>
+    </div>
+  </div>
   
-  <button id="copy-tabs-button">Copy Tabs as CSV</button>
+  <div class="action-buttons">
+    <button id="copy-tabs-button">Copy Tabs as CSV</button>
+    <button id="view-saved-tabs-button" style="display: none;">View Saved Tabs</button>
+  </div>
+  
   <p id="status-message"></p>
+  
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="../supabase-config.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

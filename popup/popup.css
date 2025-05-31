@@ -81,7 +81,86 @@ button:hover {
   line-height: 1.2;
 }
 
-#copy-tabs-button {
-  margin-top: 10px;
+.cloud-storage-section {
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.cloud-storage-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 1em;
+  color: #333;
   text-align: center;
+}
+
+.storage-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px;
+  font-size: 0.8em;
+  border-radius: 3px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-indicator.connected {
+  background-color: #28a745;
+  box-shadow: 0 0 3px #28a745;
+}
+
+.status-indicator.error {
+  background-color: #dc3545;
+  box-shadow: 0 0 3px #dc3545;
+}
+
+.status-indicator.config {
+  background-color: #ffc107;
+  box-shadow: 0 0 3px #ffc107;
+}
+
+#status-text {
+  color: #555;
+  font-size: 0.75em;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.action-buttons button {
+  margin-bottom: 0;
+}
+
+#copy-tabs-button {
+  text-align: center;
+}
+
+#view-saved-tabs-button {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+#view-saved-tabs-button:hover {
+  background-color: #0056b3;
 }
