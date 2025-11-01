@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Tab URL & Title Copier",
   "version": "1.2",
-  "description": "[DEPRECATED STUB] Not used for packaging. Use manifest.firefox.json (MV2) or manifest.chrome.json (MV3).",
+  "description": "Copies open tab titles and URLs to the clipboard with filtering and YouTube URL cleaning.",
   "permissions": [
     "tabs",
     "storage"
@@ -19,6 +19,5 @@
   "icons": {
     "48": "icons/icon-48.png",
     "96": "icons/icon-96.png"
-  },
-  "deprecated": true
+  }
 }
