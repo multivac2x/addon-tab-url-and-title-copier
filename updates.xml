@@ -7,8 +7,8 @@
         <li>
           <Description>
             <em:version>1.2</em:version>
-            <em:updateLink>https://github.com/multivac2x/addon-tab-url-and-title-copier/releases/download/v1.2/tab-url-title-copier-1.2.xpi</em:updateLink>
-            <em:updateHash>sha256:REPLACE_WITH_ACTUAL_HASH</em:updateHash>
+            <em:updateLink>https://github.com/multivac2x/addon-tab-url-and-title-copier/releases/download/v1.2/tab-url-copier-firefox-v1.2.xpi</em:updateLink>
+            <em:updateHash>sha256:63b393cbb57be430a14ea56bc83b8949144f22bfb43b66d0704e9b1b689436ce</em:updateHash>
           </Description>
         </li>
       </Seq>
