@@ -22,3 +22,17 @@ node_modules/
 
 # Logs
 *.log
+
+# BMad core files (development environment)
+.bmad-core/
+.github/chatmodes/
+.roomodes
+
+# Internal documentation (not for publication)
+database_integration_plan.md
+PRD.md
+QA_TEST_CHECKLIST.md
+STORE_SUBMISSION_CHECKLIST.md
+SUPABASE_SETUP.md
+AUDIT.md
+BUILD_STRATEGY.md
