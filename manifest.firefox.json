@@ -3,6 +3,7 @@
   "name": "Tab URL & Title Copier",
   "version": "1.2",
   "description": "Copies open tab titles and URLs to the clipboard with filtering and YouTube URL cleaning.",
+  "update_url": "https://raw.githubusercontent.com/multivac2x/addon-tab-url-and-title-copier/main/updates.xml",
   "permissions": [
     "tabs",
     "storage"
