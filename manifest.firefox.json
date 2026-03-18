@@ -21,5 +21,10 @@
     "48": "icons/icon-48.png",
     "96": "icons/icon-96.png"
   },
-  "data_collection_permissions": "This extension collects tab URLs and titles to copy them to the clipboard. No data is transmitted to external servers or stored remotely. All data remains local to your browser."
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "tab-url-title-copier@multivac2x.github.io",
+      "data_collection_permissions": "This extension collects tab URLs and titles to copy them to the clipboard. No data is transmitted to external servers or stored remotely. All data remains local to your browser."
+    }
+  }
 }
