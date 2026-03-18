@@ -24,7 +24,13 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "tab-url-title-copier@multivac2x.github.io",
-      "data_collection_permissions": "This extension collects tab URLs and titles to copy them to the clipboard. No data is transmitted to external servers or stored remotely. All data remains local to your browser."
+      "data_collection_permissions": {
+        "cookies": false,
+        "tracking": false,
+        "history": false,
+        "passwords": false,
+        "privateBrowsing": false
+      }
     }
   }
 }
